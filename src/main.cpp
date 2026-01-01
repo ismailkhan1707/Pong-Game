@@ -9,6 +9,13 @@ Color Yellow = Color{243, 213, 91, 255};
 int playerScore = 0;
 int cpuScore = 0;
 
+enum GameState {
+    PLAYING,
+    PAUSED
+};
+
+GameState state = PAUSED;
+
 class Ball{
     public:
     float x,y;
@@ -93,6 +100,14 @@ Ball ball;
 Paddle player;
 CpuPaddle cpu;
 
+void DrawPauseScreen(int screenwidth, int screenheight ){
+    DrawRectangle( 0, 0, screenwidth, screenheight, Color{0,0,0,150});
+
+    DrawText("Press P to Play or Resume", screenwidth /2, screenheight /2, 40, WHITE );
+
+    DrawText("Press ESC to Exit", screenwidth /2, screenheight /2 + 80, 40, WHITE);
+}
+
 int main(){
     const int screenwidth = 1280;
     const int screenheight = 720;
@@ -121,32 +136,49 @@ int main(){
     
     // Game loop
     while( WindowShouldClose() == false ){
-        BeginDrawing();
+        if ( IsKeyPressed(KEY_P)){
+            if (state == PLAYING){
+                state = PAUSED;
+            } else{
+                state = PLAYING;
+            }
+        }
+
         //Event handling
         
         //updating postions
-        ball.update();
-        player.Update();
-        cpu.Update(ball.y);
 
-        if (CheckCollisionCircleRec( Vector2{ball.x, ball.y}, ball.radius, Rectangle{player.x, player.y, player.width, player.height })){
-            ball.speed_x *= -1;
-        }
-        if (CheckCollisionCircleRec( Vector2{ball.x, ball.y}, ball.radius, Rectangle{cpu.x, cpu.y, cpu.width, cpu.height})){
-            ball.speed_x *= -1;
+        if (state == PLAYING){
+            ball.update();
+            player.Update();
+            cpu.Update(ball.y);
+
+            if (CheckCollisionCircleRec( Vector2{ball.x, ball.y}, ball.radius, Rectangle{player.x, player.y, player.width, player.height })){
+                ball.speed_x *= -1;
+            }
+            if (CheckCollisionCircleRec( Vector2{ball.x, ball.y}, ball.radius, Rectangle{cpu.x, cpu.y, cpu.width, cpu.height})){
+                ball.speed_x *= -1;
+            }
         }
         //drawing
-        if (IsKeyPressed(KEY_F)) SetWindowState(FLAG_FULLSCREEN_MODE);
+        BeginDrawing();
+
         ClearBackground(DarkGreen);
+
         DrawRectangle( screenwidth/2, 0, screenwidth/2, screenheight ,Green);
         DrawCircle(screenwidth/2, screenheight/2, 150, LightBrown);
         DrawLine(screenwidth/2, 0, screenwidth/2, screenheight, WHITE);
+
         ball.Draw();
         player.Draw();
         cpu.Draw();
         
         DrawText(TextFormat("%i",cpuScore), screenwidth/4 -20, 20, 80,  WHITE);
         DrawText(TextFormat("%i",playerScore), 3* screenwidth/4 -20, 20, 80,  WHITE);
+
+        if (state == PAUSED){
+            DrawPauseScreen(screenwidth, screenheight);
+        }
 
         EndDrawing();
     }
