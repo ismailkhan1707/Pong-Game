@@ -94,29 +94,29 @@ Paddle player;
 CpuPaddle cpu;
 
 int main(){
-    //SetConfigFlags(FLAG_WINDOW_RESIZABLE); 
-    const int width = 1280;
-    const int height = 680;
+    const int screenwidth = 1280;
+    const int screenheight = 720;
 
-    InitWindow(width, height, "Pong");
+    InitWindow(screenwidth, screenheight, "Pong");
+    SetWindowState(FLAG_FULLSCREEN_MODE);    
     SetTargetFPS(60);
 
     ball.radius = 20;
-    ball.x = width /2;
-    ball.y = height/2;
+    ball.x = screenwidth /2;
+    ball.y = screenheight/2;
     ball.speed_x = 7;
     ball.speed_y = 7;
 
     player.width = 25;
     player.height = 100;
-    player.x = width - player.width - 10;
-    player.y = height/2 - player.height/2;
+    player.x = screenwidth - player.width - 10;
+    player.y = screenheight/2 - player.height/2;
     player.speed = 6;
     
     cpu.width = 25;
     cpu.height = 100;
     cpu.x = 10;
-    cpu.y = height/2 - cpu.height/2;
+    cpu.y = screenheight/2 - cpu.height/2;
     cpu.speed = 6;
     
     // Game loop
@@ -138,15 +138,15 @@ int main(){
         //drawing
         if (IsKeyPressed(KEY_F)) SetWindowState(FLAG_FULLSCREEN_MODE);
         ClearBackground(DarkGreen);
-        DrawRectangle( width/2, 0, width/2, height ,Green);
-        DrawCircle(width/2, height/2, 150, LightBrown);
-        DrawLine(width/2, 0, width/2, height, WHITE);
+        DrawRectangle( screenwidth/2, 0, screenwidth/2, screenheight ,Green);
+        DrawCircle(screenwidth/2, screenheight/2, 150, LightBrown);
+        DrawLine(screenwidth/2, 0, screenwidth/2, screenheight, WHITE);
         ball.Draw();
         player.Draw();
         cpu.Draw();
         
-        DrawText(TextFormat("%i",cpuScore), width/4 -20, 20, 80,  WHITE);
-        DrawText(TextFormat("%i",playerScore), 3* width/4 -20, 20, 80,  WHITE);
+        DrawText(TextFormat("%i",cpuScore), screenwidth/4 -20, 20, 80,  WHITE);
+        DrawText(TextFormat("%i",playerScore), 3* screenwidth/4 -20, 20, 80,  WHITE);
 
         EndDrawing();
     }
