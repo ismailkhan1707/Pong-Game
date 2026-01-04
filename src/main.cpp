@@ -1,10 +1,10 @@
 #include <raylib.h>
 #include <iostream>
 
-Color Green = Color{38, 185, 154, 255};
-Color DarkGreen = Color{20, 160, 133, 255};
-Color LightBrown = Color{176, 186, 136, 255};
-Color Yellow = Color{243, 213, 91, 255};
+Color Navy  = Color{15, 20, 30, 255};
+Color Gray  = Color{45, 50, 65, 255};
+Color Volt  = Color{50, 255, 130, 255};
+Color White = Color{255, 255, 255, 255};
 
 int playerScore = 0;
 int cpuScore = 0;
@@ -23,7 +23,7 @@ class Ball{
     int radius;
     
     void Draw(){
-        DrawCircle(x, y, radius, Yellow);
+        DrawCircle(x, y, radius, White);
     }
     void ResetBall(){
         x = GetScreenWidth()/2;
@@ -69,7 +69,7 @@ class Paddle{
     int speed;
 
     void Draw(){
-        DrawRectangleRounded( Rectangle{x, y, width, height}, 0.8, 0, WHITE);
+        DrawRectangleRounded( Rectangle{x, y, width, height}, 0.8, 0, Volt);
     }
 
     void Update(){
@@ -163,18 +163,22 @@ int main(){
         //drawing
         BeginDrawing();
 
-        ClearBackground(DarkGreen);
+        ClearBackground(Navy);
 
-        DrawRectangle( screenwidth/2, 0, screenwidth/2, screenheight ,Green);
-        DrawCircle(screenwidth/2, screenheight/2, 150, LightBrown);
+        DrawRectangle( screenwidth/2, 0, screenwidth/2, screenheight ,Navy);
+        DrawCircle(screenwidth/2, screenheight/2, 150, Gray);
         DrawLine(screenwidth/2, 0, screenwidth/2, screenheight, WHITE);
+        DrawCircle(0, 0, 150, Gray);
+        DrawCircle(screenwidth, 0, 150, Gray);
+        DrawCircle(0, screenheight, 150, Gray);
+        DrawCircle(screenwidth, screenheight, 150, Gray);
 
         ball.Draw();
         player.Draw();
         cpu.Draw();
         
-        DrawText(TextFormat("%i",cpuScore), screenwidth/4 -20, 20, 80,  WHITE);
-        DrawText(TextFormat("%i",playerScore), 3* screenwidth/4 -20, 20, 80,  WHITE);
+        DrawText(TextFormat("%i",cpuScore), screenwidth/4 -20, 20, 80,  Volt);
+        DrawText(TextFormat("%i",playerScore), 3* screenwidth/4 -20, 20, 80,  Volt);
 
         if (state == PAUSED){
             DrawPauseScreen(screenwidth, screenheight);
