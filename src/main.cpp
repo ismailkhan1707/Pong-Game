@@ -8,13 +8,23 @@ Color White = Color{255, 255, 255, 255};
 
 int playerScore = 0;
 int cpuScore = 0;
+int winner = 0;
 
 enum GameState {
     PLAYING,
-    PAUSED
+    PAUSED,
+    GAME_OVER
 };
 
 GameState state = PAUSED;
+
+enum GameMode {
+    VS_CPU,
+    VS_Player
+
+};
+
+GameMode mode = VS_Player;
 
 class Ball{
     public:
@@ -93,19 +103,68 @@ class CpuPaddle : public Paddle{
         if ( y + height/2 < ball_y ){
             y = y + speed;
         }
-    LimitMovement();
+        LimitMovement();
+
     }
+        
+     void UpdatePlayer2() {
+        if (IsKeyDown(KEY_W)) {
+            y -= speed;
+        }            
+        if (IsKeyDown(KEY_S)) {
+               y += speed;
+        }
+        LimitMovement();
+        }
 };
 Ball ball;
 Paddle player;
 CpuPaddle cpu;
 
-void DrawPauseScreen(int screenwidth, int screenheight ){
-    DrawRectangle( 0, 0, screenwidth, screenheight, Color{0,0,0,150});
+void DrawPauseScreen(int screenwidth, int screenheight){
+    DrawRectangle(0, 0, screenwidth, screenheight, Color{0,0,0,150});
 
-    DrawText("Press P to Play or Resume", screenwidth /2, screenheight /2, 40, WHITE );
+    DrawText("PAUSED", screenwidth/2 , screenheight/2 - 140, 50, WHITE);
 
-    DrawText("Press ESC to Exit", screenwidth /2, screenheight /2 + 80, 40, WHITE);
+    DrawText("Press P to Resume",
+             screenwidth/2 , screenheight/2 - 60, 30, WHITE);
+
+    DrawText("Press 1 : VS CPU",
+             screenwidth/2 , screenheight/2, 30,
+             mode == VS_CPU ? Volt : WHITE);
+
+    DrawText("Press 2 : VS Player",
+             screenwidth/2 , screenheight/2 + 50, 30,
+             mode == VS_Player ? Volt : WHITE);
+
+    DrawText("Press ESC to Exit",
+             screenwidth/2 , screenheight/2 + 120, 30, WHITE);
+}
+
+void DrawGameOverScreen(int screenwidth, int screenheight){
+    DrawRectangle(0, 0, screenwidth, screenheight, Color{0,0,0,180});
+
+    if (winner == 1){
+        DrawText("RIGHT PLAYER WINS",
+                 screenwidth/2 , screenheight/2 - 40, 50, Volt);
+    } else {
+        DrawText("LEFT PLAYER WINS",
+                 screenwidth/2 , screenheight/2 - 40, 50, Volt);
+    }
+
+    DrawText("Press P to Restart",
+             screenwidth/2 , screenheight/2 + 40, 30, WHITE);
+
+    DrawText("Press ESC to Exit",
+             screenwidth/2 , screenheight/2 + 90, 30, WHITE);
+}
+
+
+
+void ResetGame() {
+    playerScore = 0;
+    cpuScore = 0;
+    ball.ResetBall();
 }
 
 int main(){
@@ -143,6 +202,21 @@ int main(){
                 state = PLAYING;
             }
         }
+        if (state == PAUSED) {
+            if (IsKeyPressed(KEY_ONE)) {
+                mode = VS_CPU;
+                ResetGame();
+            }
+            if (IsKeyPressed(KEY_TWO)) {
+                mode = VS_Player;
+                ResetGame();
+            }
+}
+
+        if (state == GAME_OVER && IsKeyPressed(KEY_P)){
+            ResetGame();
+            state = PAUSED;
+        }
 
         //Event handling
         
@@ -151,7 +225,23 @@ int main(){
         if (state == PLAYING){
             ball.update();
             player.Update();
-            cpu.Update(ball.y);
+
+            if (mode == VS_CPU ){
+                cpu.Update(ball.y);
+            }
+            else{
+                cpu.UpdatePlayer2();
+            }
+
+            if (playerScore == 7) {
+                winner = 1;
+                state = GAME_OVER;
+            }
+
+            if (cpuScore == 7) {
+                winner = 2;
+                state = GAME_OVER;
+            }
 
             if (CheckCollisionCircleRec( Vector2{ball.x, ball.y}, ball.radius, Rectangle{player.x, player.y, player.width, player.height })){
                 ball.speed_x *= -1;
@@ -182,6 +272,10 @@ int main(){
 
         if (state == PAUSED){
             DrawPauseScreen(screenwidth, screenheight);
+        }
+
+        if (state == GAME_OVER){
+            DrawGameOverScreen(screenwidth, screenheight);
         }
 
         EndDrawing();
